@@ -1,0 +1,30 @@
+from abc import ABC, abstractmethod
+import polars as pl
+from core.bom_tree import BOMTree
+from core.stock_manager import StockManager
+
+class BaseAllocator(ABC):
+    """
+    Abstract base class for all allocation strategies.
+    Defines the interface that every allocator must implement.
+    """
+
+    def __init__(self, so_df: pl.DataFrame, bom_tree: BOMTree, stock_manager: StockManager):
+        """
+        :param so_df: Sales order dataframe
+        :param bom_tree: BOMTree object with precomputed BOM
+        :param stock_manager: StockManager object to get/set stock
+        """
+        self.so_df = so_df
+        self.bom_tree = bom_tree
+        self.stock_manager = stock_manager
+
+    @abstractmethod
+    def allocate(self) -> pl.DataFrame:
+        """
+        Perform allocation according to the strategy.
+        Must return a Polars DataFrame with columns:
+        SO_ID, Sr_No, BOM_Level, Item, Order_Qty, Stock_Before,
+        Allocated_Qty, Order_Remaining, Remaining_Stock
+        """
+        pass

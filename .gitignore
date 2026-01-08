@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Output folder (optional, since you can regenerate)
+output/
+
+# Cache folder
+cache/
+
+# Excel / CSV input files (optional: include if you don't want to push user data)
+input/*.csv
+input/*.xlsx
+
+# Pytest cache
+.pytest_cache/
+
+# MyPy / Linting cache
+.mypy_cache/
+.mypy_cache/

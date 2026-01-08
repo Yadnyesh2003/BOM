@@ -1,0 +1,6 @@
+allocation_type: partial       # options: partial / orderwise / batchwise / levelwise
+output_file: "bom_output_partial.csv"
+csv_inputs:
+  bom: "BOM_Input.csv"
+  so: "OID_QTY_RP.csv"
+  production: "Production_Report.csv"
