@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import polars as pl
-from core.bom_tree import BOMTree
-from core.stock_manager import StockManager
+from common.bom_tree import BOMTree
+from common.stock_manager import StockManager
 
 class BaseAllocator(ABC):
     """

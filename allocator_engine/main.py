@@ -1,23 +1,27 @@
 from pathlib import Path
 from io_modules.reader import read_csv
 from io_modules.writer import write_csv
-from core.stock_manager import StockManager
-from core.bom_tree import BOMTree
-from strategies.partial_allocation import PartialAllocator
+from common.stock_manager import StockManager
+from common.bom_tree import BOMTree
+from core.component_allocation.strategies.partial import PartialComponentAllocator
 from io_modules.config_reader import read_config
 import polars as pl
+from pipeline.allocation_pipeline import AllocationPipeline
+
 
 # 1️⃣ Paths
 BASE_PATH = Path(r"D:\000 VDL TESTING WORK\Polars_Alloc_Refactor")
-CONFIG_PATH = BASE_PATH / "allocator_engine" / "config" / "allocation_config.yaml"
+CONFIG_PATH = BASE_PATH / "allocator_engine" / "config" / "config.yaml"
 
 # 2️⃣ Load config
 config = read_config(CONFIG_PATH)
+pipeline = AllocationPipeline(config)
+pipeline.run()
 
 # 3️⃣ Read input files from config
 bom_df = read_csv(BASE_PATH / "input" / config["csv_inputs"]["bom"])
 so_df = read_csv(BASE_PATH / "input" / config["csv_inputs"]["so"])
-prod_df = read_csv(BASE_PATH / "input" / config["csv_inputs"]["production"])
+prod_df = read_csv(BASE_PATH / "input" / config["csv_inputs"]["stock"])
 
 # 4️⃣ Clean data
 bom_df = bom_df.with_columns([
@@ -53,7 +57,7 @@ bom_tree_obj = BOMTree(bom_df)
 allocation_type = config.get("allocation_type", "partial")
 
 if allocation_type == "partial":
-    allocator = PartialAllocator(so_df, bom_tree_obj, stock_manager)
+    allocator = PartialComponentAllocator(so_df, bom_tree_obj, stock_manager)
     output_df = allocator.allocate()
 else:
     raise NotImplementedError(f"Allocation type {allocation_type} not implemented yet.")

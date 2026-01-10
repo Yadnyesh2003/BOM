@@ -1,7 +1,7 @@
 import polars as pl
-from core.base_allocator import BaseAllocator
+from core.component_allocation.base_component_allocator import BaseAllocator
 
-class PartialAllocator(BaseAllocator):
+class PartialComponentAllocator(BaseAllocator):
     """
     Partial allocation strategy using DFS on BOM tree.
     """

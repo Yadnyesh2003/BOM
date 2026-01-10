@@ -1,0 +1,27 @@
+# allocation_type: partial       # options: partial / orderwise / batchwise / levelwise
+# output_file: "bom_output_partial.csv"
+# csv_inputs:
+#   bom: "BOM_Input.csv"
+#   so: "OID_QTY_RP.csv"
+#   production: "Production_Report.csv"
+
+phases:
+  order_allocation:
+    enabled: false
+    type: partial
+    input_source: input
+    output_path: intermediate/order_allocation/
+
+  component_allocation:
+    enabled: true
+    type: partial
+    # input_source: intermediate/order_allocation/
+    input_source: intermediate
+    output_path: output/
+
+csv_inputs:
+  bom: BOM_Input.csv
+  so: OID_QTY_RP.csv
+  stock: Production_Report.csv
+
+base_path: D:\000 VDL TESTING WORK\Polars_Alloc_Refactor
