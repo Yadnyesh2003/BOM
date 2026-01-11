@@ -3,9 +3,9 @@ import polars as pl
 from common.bom_tree import BOMTree
 from common.stock_manager import StockManager
 
-class BaseAllocator(ABC):
+class BaseComponentAllocator(ABC):
     """
-    Abstract base class for all allocation strategies.
+    Abstract base class for all Component Allocation strategies.
     Defines the interface that every allocator must implement.
     """
 

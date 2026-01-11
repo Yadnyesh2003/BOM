@@ -66,12 +66,14 @@ class AllocationPipeline:
         # Clean data
         bom_df = bom_df.with_columns([
             pl.col("Finished_Good").cast(pl.Utf8).str.strip_chars(),
+            pl.col("Plant").cast(pl.Utf8).str.strip_chars(),
             pl.col("Parent").cast(pl.Utf8).str.strip_chars(),
             pl.col("Child").cast(pl.Utf8).str.strip_chars(),
             pl.col("BOM_Ratio_Of_Child").fill_null(0).cast(pl.Float64)
         ])
         prod_df = prod_df.with_columns([
             pl.col("Child").cast(pl.Utf8).str.strip_chars(),
+            pl.col("Plant").cast(pl.Utf8).str.strip_chars(),
             pl.col("Order_ID").cast(pl.Utf8).str.strip_chars(),
             pl.col("Total_Stock").fill_null(0).cast(pl.Float64)
         ])
@@ -80,13 +82,13 @@ class AllocationPipeline:
         so_stock_df = (
             prod_df
             .filter(pl.col("Order_ID").is_not_null() & (pl.col("Order_ID") != ""))
-            .group_by(["Order_ID", "Child"])
+            .group_by(["Order_ID", "Child", "Plant"])
             .agg(pl.sum("Total_Stock").alias("Stock"))
         )
         item_stock_df = (
             prod_df
             .filter(pl.col("Order_ID").is_null() | (pl.col("Order_ID") == ""))
-            .group_by("Child")
+            .group_by(["Child", "Plant"])
             .agg(pl.sum("Total_Stock").alias("Stock"))
         )
 
@@ -138,4 +140,4 @@ class AllocationPipeline:
 
         write_csv(data["component_allocation_df"], output_file)
 
-        print(f"✅ Component allocation written to: {output_file}")
+        print(f"Component allocation written to: {output_file}")

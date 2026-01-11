@@ -1,6 +1,6 @@
-﻿SO_ID,Order_Qty,FG_ID
-100-1,100,Chocolate Bar
-100-2,30,Potato Chips Packet
-101-1,35,Chocolate Bar
-101-2,55,Potato Chips Packet
-101-3,100,Potato Chips Packet
+﻿SO_ID,Plant,Order_Qty,FG_ID
+100-1,Mumbai,100,Chocolate Bar
+100-2,Pune,30,Potato Chips Packet
+101-1,Pune,35,Chocolate Bar
+101-2,Mumbai,55,Potato Chips Packet
+101-3,Pune,100,Potato Chips Packet
