@@ -1,12 +1,8 @@
 ﻿Finished_Good,Plant,BOM_Level_Of_Child,Parent,Child,BOM_Ratio_Of_Child
-Chocolate Bar,Mumbai,,Chocolate Bar,Moulded Chocolate,1
-Chocolate Bar,Mumbai,,Moulded Chocolate,Liquid Chocolate,1
-Chocolate Bar,Mumbai,,Liquid Chocolate,Milk,1
-Chocolate Bar,Mumbai,,Liquid Chocolate,Sugar,1
-Chocolate Bar,Mumbai,,Liquid Chocolate,Coco Powder,1
-Chocolate Bar,Mumbai,,Coco Powder,Coco Beans,1
-Potato Chips Packet,Pune,,Potato Chips Packet,Potato Chips,1
-Potato Chips Packet,Pune,,Potato Chips,Potato Slices,1
-Potato Chips Packet,Pune,,Potato Chips,Palm Oil,1
-Potato Chips Packet,Pune,,Potato Chips,Salt,1
-Potato Chips Packet,Pune,,Potato Slices,Potato,1
+FG1,ABC,,FG1,SFG1,2
+FG1,ABC,,FG1,SFG2,3
+FG1,ABC,,FG1,PM1,4
+FG1,ABC,,SFG1,SFG3,4
+FG1,ABC,,SFG1,RM1,2
+FG1,ABC,,SFG2,RM2,1
+FG1,ABC,,SFG3,RM3,2

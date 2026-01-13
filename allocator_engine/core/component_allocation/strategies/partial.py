@@ -26,12 +26,14 @@ class PartialComponentAllocator(BaseComponentAllocator):
             fg_qty = float(r.get("Order_Qty") or 0)
 
             # Skip if BOM not found
-            if fg not in self.bom_tree.bom_tree_map:
+            if (fg, plant) not in self.bom_tree.bom_tree_map:
+                print(f"[SKIP] No BOM for FG={fg}, Plant={plant}")
                 continue
 
             bom_tree = self.bom_tree.get_tree(fg, plant)
-            if not bom_tree:
-                continue
+            # if not bom_tree:
+            #     print(f"[SKIP] No BOM for FG={fg}, Plant={plant}")
+            #     continue
             
             stack = [{
                 "item": fg,
@@ -42,7 +44,7 @@ class PartialComponentAllocator(BaseComponentAllocator):
 
             while stack:
                 current = stack.pop()
-                available = self.stock_manager.get_stock(so_id, current["item"])
+                available = self.stock_manager.get_stock(plant, so_id, current["item"])
 
                 # Compute allocation (respecting config if needed)
                 allocated = min(current["order_qty"], available)
@@ -53,7 +55,7 @@ class PartialComponentAllocator(BaseComponentAllocator):
                 stock_remaining = available - allocated
 
                 # Update stock
-                self.stock_manager.set_stock(so_id, current["item"], stock_remaining)
+                self.stock_manager.set_stock(plant, so_id, current["item"], stock_remaining)
 
                 # Append to output
                 output_columns["SO_ID"].append(so_id)
@@ -97,7 +99,7 @@ class PartialComponentAllocator(BaseComponentAllocator):
 
 
 
-# # USING BFS APPROACH IF NEEDED
+# # USING BFS APPROACH IF NEEDED - PLANT LOGIC MISSING
 # import polars as pl
 # from collections import deque
 # from core.component_allocation.base_component_allocator import BaseComponentAllocator
