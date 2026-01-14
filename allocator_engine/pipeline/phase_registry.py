@@ -8,6 +8,7 @@ from core.component_allocation.strategies.partial import PartialComponentAllocat
 
 ORDER_ALLOCATORS = {
     "partial": PartialOrderAllocator,
+    # "batchwise": BatchwiseOrderAllocator,
 }
 
 COMPONENT_ALLOCATORS = {

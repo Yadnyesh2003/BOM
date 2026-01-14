@@ -12,10 +12,6 @@ class PartialComponentAllocator(BaseComponentAllocator):
     Partial allocation strategy using DFS on BOM tree.
     """
 
-    def __init__(self, so_df: pl.DataFrame, bom_tree, stock_manager, config: dict = None):
-        super().__init__(so_df, bom_tree, stock_manager)
-        self.config = config or {}
-
     def allocate(self) -> pl.DataFrame:
         # Initialize output columns
         output_columns = {name: [] for name in [
