@@ -1,19 +1,47 @@
+logging:
+  level: ERROR
+
+client: ISMT
+
 phases:
   order_allocation:
-    enabled: false
+    enabled: true
     type: partial
     input_source: input
     output_path: intermediate
+    csv_inputs:
+      bom: BOM_Input.csv
+      so: OID_QTY_RP.csv
+      stock: Production_Report.csv
 
   component_allocation:
-    enabled: true
+    enabled: false
     type: partial
     input_source: intermediate
     output_path: output/
-
-csv_inputs:
-  bom: BOM_Input.csv
-  so: OID_QTY_RP.csv
-  stock: Production_Report.csv
+    csv_inputs:
+      bom: BOM_Input.csv
+      so: OID_QTY_RP.csv
+      stock: Remaining_Stock.csv
 
 base_path: D:\000 VDL TESTING WORK\Polars_Alloc_Refactor
+
+schemas:
+  so:
+    order_id: SO_ID
+    fg_id: FG_ID
+    order_qty: Order_Qty
+    plant: Plant
+  stock:
+    order_id: Order_ID
+    item_id: Child
+    plant: Plant
+    stock: Stock
+  bom:
+    root_parent: Finished_Good
+    parent: Parent
+    child: Child
+    comp_qty: BOM_Ratio_Of_Child
+    plant: Plant
+
+# Order_ID,Child,Plant,Parent,Stock

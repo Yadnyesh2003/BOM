@@ -1,8 +1,14 @@
-﻿Order_ID,Child,Plant,Parent,Column,Total_Stock
-,SFG1,ABC,FG1,,100
-,SFG2,ABC,FG1,,200
-,PM1,ABC,FG1,,400
-,SFG3,ABC,SFG1,,300
-,RM1,ABC,SFG1,,500
-,RM2,ABC,SFG2,,200
-,RM3,ABC,SFG3,,2000
+Plant,Order_ID,Child,Stock
+Pune,,Salt,70.0
+Mumbai,,Milk,70.0
+Pune,,Potato,70.0
+Mumbai,,Coco Powder,70.0
+Pune,,Potato Chips,70.0
+Pune,,Palm Oil,70.0
+Mumbai,,Coco Beans,70.0
+Pune,,Potato Slices,70.0
+Mumbai,,Liquid Chocolate,70.0
+Mumbai,,Sugar,70.0
+Mumbai,,Chocolate Bar,0.0
+Pune,,Potato Chips Packet,30.0
+Mumbai,,Moulded Chocolate,10.0

@@ -40,15 +40,26 @@ class StockManager:
             key = self._key(r["Plant"], None, r["Child"])
             self.remaining_stock[key] = r["Stock"]
 
+    def has_stock(self, plant, so_id, item):
+        return (
+            self._key(plant, so_id, item) in self.remaining_stock
+            or self._key(plant, None, item) in self.remaining_stock
+        )
+
     def get_stock(self, plant, so_id, item):
         key = self._key(plant, so_id, item)
         if key in self.remaining_stock:
             return self.remaining_stock[key]
         return self.remaining_stock.get(self._key(plant, None, item), 0)
 
+
     def set_stock(self, plant, so_id, item, value):
-        key = self._key(plant, so_id, item)
-        if key in self.remaining_stock:
-            self.remaining_stock[key] = value
+        so_key = self._key(plant, so_id, item)
+        item_key = self._key(plant, None, item)
+
+        if so_key in self.remaining_stock:
+            self.remaining_stock[so_key] = value
+        elif item_key in self.remaining_stock:
+            self.remaining_stock[item_key] = value
         else:
-            self.remaining_stock[self._key(plant, None, item)] = value
+            return

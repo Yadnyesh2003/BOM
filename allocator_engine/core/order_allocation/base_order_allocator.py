@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import polars as pl
-from allocator_engine.common.stock_manager import StockManager
+from common.stock_manager import StockManager
 
 class BaseOrderAllocator(ABC):
     def __init__(self, so_df: pl.DataFrame, stock_manager: StockManager) -> None:

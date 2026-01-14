@@ -1,8 +1,0 @@
-﻿Finished_Good,Plant,BOM_Level_Of_Child,Parent,Child,BOM_Ratio_Of_Child
-FG1,ABC,,FG1,SFG1,2
-FG1,ABC,,FG1,SFG2,3
-FG1,ABC,,FG1,PM1,4
-FG1,ABC,,SFG1,SFG3,4
-FG1,ABC,,SFG1,RM1,2
-FG1,ABC,,SFG2,RM2,1
-FG1,ABC,,SFG3,RM3,2

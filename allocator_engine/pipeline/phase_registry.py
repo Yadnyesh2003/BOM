@@ -1,17 +1,13 @@
 # Order Allocation strategies
-# from order_allocation.strategies.partial import PartialOrderAllocator
-# from order_allocation.strategies.batchwise import BatchwiseOrderAllocator
+from core.order_allocation.strategies.partial import PartialOrderAllocator
 
 # Component Allocation strategies
 from core.component_allocation.strategies.partial import PartialComponentAllocator
-# from component_allocation.strategies.batchwise import BatchwiseComponentAllocator
-# from component_allocation.strategies.levelwise import LevelwiseComponentAllocator
 
 
 
 ORDER_ALLOCATORS = {
-    # "partial": PartialOrderAllocator,
-    # "batchwise": BatchwiseOrderAllocator
+    "partial": PartialOrderAllocator,
 }
 
 COMPONENT_ALLOCATORS = {

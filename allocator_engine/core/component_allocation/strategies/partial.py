@@ -1,6 +1,12 @@
 import polars as pl
 from core.component_allocation.base_component_allocator import BaseComponentAllocator
 
+REQUIRED_COLUMNS = {
+    "so": ["order_id", "fg_id", "plant", "order_qty"],
+    "stock": ["order_id", "item_id", "plant", "stock"],
+    "bom": ["root_parent", "plant", "parent", "child", "comp_qty"]
+}
+
 class PartialComponentAllocator(BaseComponentAllocator):
     """
     Partial allocation strategy using DFS on BOM tree.

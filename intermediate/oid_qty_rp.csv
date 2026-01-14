@@ -1,2 +1,3 @@
-﻿SO_ID,Plant,Order_Qty,FG_ID
-100-1,ABC,200,FG1
+SO_ID,Plant,FG_ID,Order_Qty
+100-1,Mumbai,Chocolate Bar,0.0
+101-2,Pune,Potato Chips Packet,0.0
