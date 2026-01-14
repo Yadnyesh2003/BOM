@@ -22,10 +22,10 @@ class PartialComponentAllocator(BaseComponentAllocator):
 
         # Loop through each sales order
         for so_index, r in enumerate(self.so_df.iter_rows(named=True)):
-            so_id = str(r["SO_ID"]).strip()
-            fg = str(r["FG_ID"]).strip()
-            plant = str(r["Plant"]).strip()
-            fg_qty = float(r.get("Order_Qty") or 0)
+            so_id = str(r["order_id"]).strip()
+            fg = str(r["fg_id"]).strip()
+            plant = str(r["plant"]).strip()
+            fg_qty = float(r.get("order_qty") or 0)
 
             # Skip if BOM not found
             if (fg, plant) not in self.bom_tree.bom_tree_map:
@@ -33,9 +33,9 @@ class PartialComponentAllocator(BaseComponentAllocator):
                 continue
 
             bom_tree = self.bom_tree.get_tree(fg, plant)
-            # if not bom_tree:
-            #     print(f"[SKIP] No BOM for FG={fg}, Plant={plant}")
-            #     continue
+            if not bom_tree:
+                print(f"[SKIP] No BOM for FG={fg}, Plant={plant}")
+                continue
             
             stack = [{
                 "item": fg,

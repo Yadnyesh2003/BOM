@@ -33,12 +33,12 @@ class StockManager:
 
     def load_stock(self, so_stock_df, item_stock_df):
         for r in so_stock_df.iter_rows(named=True):
-            key = self._key(r["Plant"], r["Order_ID"], r["Child"])
-            self.remaining_stock[key] = r["Stock"]
+            key = self._key(r["plant"], r["order_id"], r["item_id"])
+            self.remaining_stock[key] = r["stock"]
 
         for r in item_stock_df.iter_rows(named=True):
-            key = self._key(r["Plant"], None, r["Child"])
-            self.remaining_stock[key] = r["Stock"]
+            key = self._key(r["plant"], None, r["item_id"])
+            self.remaining_stock[key] = r["stock"]
 
     def has_stock(self, plant, so_id, item):
         return (

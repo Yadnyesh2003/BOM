@@ -85,7 +85,15 @@ class EngineLogger:
     def warning(self, msg: str):
         self.logger.warning(msg)
 
-    def error(self, msg: str, exc: Exception = None):
-        self.logger.error(msg)
-        if exc:
-            self.logger.error(traceback.format_exc())
+    def error(self, msg: str, exc_info=False):
+        self.logger.error(msg, exc_info=exc_info)
+
+    def debug(self, msg: str):
+        self.logger.debug(msg)
+
+    def critical(self, msg: str, exc_info=False):
+        self.logger.critical(msg, exc_info=exc_info)
+
+    def exception(self, msg: str):
+        self.logger.exception(msg)
+

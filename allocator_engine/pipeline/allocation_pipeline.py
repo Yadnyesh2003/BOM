@@ -1,3 +1,4 @@
+from asyncio.log import logger
 from io_modules.reader import read_csv
 from io_modules.writer import write_csv
 from pathlib import Path
@@ -7,28 +8,30 @@ from pipeline.phase_registry import ORDER_ALLOCATORS
 from common.stock_manager import StockManager
 from common.bom_tree import BOMTree
 from core.component_allocation.strategies.partial import PartialComponentAllocator
-from utils.logger import EngineLogger
+from utils.schema_resolver import SchemaResolver
+
+REQUIRED_COLUMNS = {
+    "so": ["order_id", "fg_id", "plant", "order_qty"],
+    "stock": ["order_id", "fg_id", "item_id", "plant", "stock"],
+    "bom": ["root_parent", "plant", "parent", "child", "comp_qty"]
+}
 
 class AllocationPipeline:
     def __init__(self, config, logger):
         self.config = config
+        self.logger = logger
 
-    # def run(self):
-    #     data = self._load_initial_inputs()
-    #     if self.config["phases"]["order_allocation"]["enabled"]:
-    #         data = self._run_order_allocation(data)
-    #     if self.config["phases"]["component_allocation"]["enabled"]:
-    #         data = self._run_component_allocation(data)
-    #     self._write_outputs(data)
+
     def run(self):
         phases = self.config["phases"]
 
         if not phases["order_allocation"]["enabled"] and \
         not phases["component_allocation"]["enabled"]:
-            raise ValueError(
+            self.logger.error(
                 "Invalid config: At least one phase must be enabled "
                 "(order_allocation or component_allocation)"
             )
+            return
 
         data = self._load_initial_inputs()
 
@@ -44,6 +47,7 @@ class AllocationPipeline:
     def _read_phase_inputs(self, phase_name: str) -> dict:
         phase_cfg = self.config["phases"][phase_name]
         base_path = Path(self.config["base_path"])
+        schemas = self.config["schemas"]
 
         input_root = base_path / phase_cfg["input_source"]
         csv_cfg = phase_cfg["csv_inputs"]
@@ -51,13 +55,34 @@ class AllocationPipeline:
         data = {}
 
         if "bom" in csv_cfg:
-            data["bom_df"] = read_csv(input_root / csv_cfg["bom"])
+            raw_dom_df = read_csv(input_root / csv_cfg["bom"])
+            data["bom_df"] = SchemaResolver.resolve(
+                df=raw_dom_df,
+                schema_cfg=schemas["bom"],
+                required_keys=REQUIRED_COLUMNS["bom"],
+                df_name="BOM",
+                logger=self.logger
+            )
 
         if "so" in csv_cfg:
-            data["so_df"] = read_csv(input_root / csv_cfg["so"])
+            raw_so_df = read_csv(input_root / csv_cfg["so"])
+            data["so_df"] = SchemaResolver.resolve(
+                df=raw_so_df,
+                schema_cfg=schemas["so"],
+                required_keys=REQUIRED_COLUMNS["so"],
+                df_name="SO",
+                logger=self.logger
+            )
 
         if "stock" in csv_cfg:
-            data["stock_df"] = read_csv(input_root / csv_cfg["stock"])
+            raw_stock_df = read_csv(input_root / csv_cfg["stock"])
+            data["stock_df"] = SchemaResolver.resolve(
+                df=raw_stock_df,
+                schema_cfg=schemas["stock"],
+                required_keys=REQUIRED_COLUMNS["stock"],
+                df_name="Stock",
+                logger=self.logger
+            )
 
         return data
 
@@ -83,26 +108,26 @@ class AllocationPipeline:
 
         # Clean stock
         stock_df = stock_df.with_columns([
-            pl.col("Child").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Plant").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Order_ID").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Stock").fill_null(0).cast(pl.Float64)
+            pl.col("order_id").cast(pl.Utf8).str.strip_chars(),
+            pl.col("item_id").cast(pl.Utf8).str.strip_chars(),
+            pl.col("plant").cast(pl.Utf8).str.strip_chars(),
+            pl.col("stock").fill_null(0).cast(pl.Float64)
         ])
 
         # SO-level FG stock
         so_stock_df = (
             stock_df
-            .filter(pl.col("Order_ID").is_not_null() & (pl.col("Order_ID") != ""))
-            .group_by(["Order_ID", "Child", "Plant"])
-            .agg(pl.sum("Stock").alias("Stock"))
+            .filter(pl.col("order_id").is_not_null() & (pl.col("order_id") != ""))
+            .group_by(["order_id", "plant", "item_id"])
+            .agg(pl.sum("stock").alias("stock"))
         )
 
         # ITEM-level FG stock
         item_stock_df = (
             stock_df
-            .filter(pl.col("Order_ID").is_null() | (pl.col("Order_ID") == ""))
-            .group_by(["Child", "Plant"])
-            .agg(pl.sum("Stock").alias("Stock"))
+            .filter(pl.col("order_id").is_null() | (pl.col("order_id") == ""))
+            .group_by(["plant", "item_id"])
+            .agg(pl.sum("stock").alias("stock"))
         )
 
         stock_manager = StockManager()
@@ -131,31 +156,31 @@ class AllocationPipeline:
 
         # Clean data
         bom_df = bom_df.with_columns([
-            pl.col("Finished_Good").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Plant").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Parent").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Child").cast(pl.Utf8).str.strip_chars(),
-            pl.col("BOM_Ratio_Of_Child").fill_null(0).cast(pl.Float64)
+            pl.col("root_parent").cast(pl.Utf8).str.strip_chars(),
+            pl.col("plant").cast(pl.Utf8).str.strip_chars(),
+            pl.col("parent").cast(pl.Utf8).str.strip_chars(),
+            pl.col("child").cast(pl.Utf8).str.strip_chars(),
+            pl.col("comp_qty").fill_null(0).cast(pl.Float64)
         ])
         stock_df = stock_df.with_columns([
-            pl.col("Child").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Plant").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Order_ID").cast(pl.Utf8).str.strip_chars(),
-            pl.col("Stock").fill_null(0).cast(pl.Float64)
+            pl.col("order_id").cast(pl.Utf8).str.strip_chars(),
+            pl.col("item_id").cast(pl.Utf8).str.strip_chars(),
+            pl.col("plant").cast(pl.Utf8).str.strip_chars(),
+            pl.col("stock").fill_null(0).cast(pl.Float64)
         ])
 
         # Aggregate stock
         so_stock_df = (
             stock_df
-            .filter(pl.col("Order_ID").is_not_null() & (pl.col("Order_ID") != ""))
-            .group_by(["Order_ID", "Child", "Plant"])
-            .agg(pl.sum("Stock").alias("Stock"))
+            .filter(pl.col("order_id").is_not_null() & (pl.col("order_id") != ""))
+            .group_by(["order_id", "item_id", "plant"])
+            .agg(pl.sum("stock").alias("stock"))
         )
         item_stock_df = (
             stock_df
-            .filter(pl.col("Order_ID").is_null() | (pl.col("Order_ID") == ""))
-            .group_by(["Child", "Plant"])
-            .agg(pl.sum("Stock").alias("Stock"))
+            .filter(pl.col("order_id").is_null() | (pl.col("order_id") == ""))
+            .group_by(["item_id", "plant"])
+            .agg(pl.sum("stock").alias("stock"))
         )
 
         # Initialize StockManager & BOMTree

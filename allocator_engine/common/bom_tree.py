@@ -35,11 +35,11 @@ class BOMTree:
         # Group by FG + Plant
         grouped = defaultdict(list)
         for r in bom_df.iter_rows(named=True):
-            key = (r["Finished_Good"], r["Plant"])
+            key = (r["root_parent"], r["plant"])
             grouped[key].append({
-                "parent": r["Parent"],
-                "child": r["Child"],
-                "ratio": r["BOM_Ratio_Of_Child"]
+                "parent": r["parent"],
+                "child": r["child"],
+                "ratio": r["comp_qty"]
             })
 
         # Build tree per (FG, Plant)

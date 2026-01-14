@@ -40,6 +40,8 @@ cache/
 # Excel / CSV input files (optional: include if you don't want to push user data)
 input/*.csv
 input/*.xlsx
+intermediate/*.csv
+output/*.csv
 
 # Pytest cache
 .pytest_cache/

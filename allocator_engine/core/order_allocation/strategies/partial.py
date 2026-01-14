@@ -15,11 +15,11 @@ class PartialOrderAllocator(BaseOrderAllocator):
     def allocate(self):
         so_rows = []
 
-        for r in self.so_df.iter_rows(named=True):
-            so_id = str(r["SO_ID"]).strip()
-            fg = str(r["FG_ID"]).strip()
-            plant = str(r["Plant"]).strip()
-            order_qty = float(r["Order_Qty"] or 0)
+        for r in self.so_df.iter_rows(named=True): 
+            so_id = str(r["order_id"]).strip()
+            fg = str(r["fg_id"]).strip()
+            plant = str(r["plant"]).strip()
+            order_qty = float(r["order_qty"] or 0)
 
             available = self.stock_manager.get_stock(
                 plant=plant,
@@ -40,10 +40,10 @@ class PartialOrderAllocator(BaseOrderAllocator):
             )
 
             so_rows.append({
-                "SO_ID": so_id,
-                "Plant": plant,
-                "FG_ID": fg,
-                "Order_Qty": remaining_order
+                "order_id": so_id,
+                "plant": plant,
+                "fg_id": fg,
+                "order_qty": remaining_order
             })
 
         updated_so_df = pl.DataFrame(so_rows)
@@ -54,10 +54,10 @@ class PartialOrderAllocator(BaseOrderAllocator):
             plant, scope, item = key.split("__")
 
             stock_rows.append({
-                "Plant": plant,
-                "Order_ID": None if scope == "ITEM" else scope,
-                "Child": item,
-                "Stock": qty
+                "order_id": None if scope == "ITEM" else scope,
+                "item_id": item,
+                "plant": plant,
+                "stock": qty
             })
 
         remaining_stock_df = pl.DataFrame(stock_rows)
