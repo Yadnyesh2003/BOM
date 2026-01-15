@@ -34,6 +34,7 @@ class BOMTree:
 
         # Group by FG + Plant
         grouped = defaultdict(list)
+        self.parent_index = defaultdict(list)
         for r in bom_df.iter_rows(named=True):
             key = (r["root_parent"], r["plant"])
             grouped[key].append({
@@ -41,6 +42,8 @@ class BOMTree:
                 "child": r["child"],
                 "ratio": r["comp_qty"]
             })
+            # New reverse lookup
+            self.parent_index[(r["parent"], r["plant"])].append(r["root_parent"])
 
         # Build tree per (FG, Plant)
         for key, entries in grouped.items():
@@ -51,3 +54,22 @@ class BOMTree:
 
     def get_tree(self, fg, plant):
         return self.bom_tree_map.get((fg, plant), {})
+    
+    def resolve_fg(self, fg, plant):
+        """
+        Returns:
+        - resolved_root_fg
+        - bom_tree
+        - resolution_type: 'ROOT' | 'SFG'
+        """
+        # Normal FG case
+        if (fg, plant) in self.bom_tree_map:
+            return fg, self.bom_tree_map[(fg, plant)], "ROOT"
+        # SFG fallback
+        candidates = self.parent_index.get((fg, plant), [])
+        if candidates:
+            root_fg = candidates[0]  # deterministic first match
+            return root_fg, self.bom_tree_map[(root_fg, plant)], "SFG"
+        # Not found
+        return None, None, "NOT_FOUND"
+
