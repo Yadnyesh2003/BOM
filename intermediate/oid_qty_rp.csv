@@ -1,3 +1,4 @@
-SO_ID,Plant,FG_ID,Order_Qty
-100-1,Mumbai,Chocolate Bar,0.0
-101-2,Pune,Potato Chips Packet,0.0
+order_id,plant,fg_id,order_qty,order_allocation_remarks,component_allocation_remarks
+100-1,Mumbai,Chocolate Bar,160.0,Stock found for FG 'Chocolate Bar'. Allocated 90.0 out of 250.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+100-2,Delhi,Noodles,100.0,No stock found for FG 'Noodles'. Allocated 0 out of 100.0.,BOM not present for FG 'Noodles' at Plant 'Delhi'. Order skipped.
+101-2,Pune,Potato Chips Packet,250.0,Stock found for FG 'Potato Chips Packet'. Allocated 50.0 out of 300.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.

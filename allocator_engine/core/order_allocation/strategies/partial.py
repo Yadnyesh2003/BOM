@@ -1,10 +1,6 @@
 import polars as pl
 from core.order_allocation.base_order_allocator import BaseOrderAllocator
 
-REQUIRED_COLUMNS = {
-    "so": ["order_id", "fg_id", "plant", "order_qty"],
-    "stock": ["order_id", "item_id", "plant", "stock"]
-}
 
 class PartialOrderAllocator(BaseOrderAllocator):
     """
@@ -27,7 +23,18 @@ class PartialOrderAllocator(BaseOrderAllocator):
                 item=fg
             )
 
-            allocated = min(order_qty, available)
+            if available > 0:
+                allocated = min(order_qty, available)
+                remark = (
+                    f"Stock found for FG '{fg}'. "
+                    f"Allocated {allocated} out of {order_qty}."
+                )
+            else:
+                allocated = 0
+                remark = (
+                    f"No stock found for FG '{fg}'. "
+                    f"Allocated 0 out of {order_qty}."
+                )
             remaining_order = order_qty - allocated
             remaining_stock = available - allocated
 
@@ -43,7 +50,8 @@ class PartialOrderAllocator(BaseOrderAllocator):
                 "order_id": so_id,
                 "plant": plant,
                 "fg_id": fg,
-                "order_qty": remaining_order
+                "order_qty": remaining_order,
+                "order_allocation_remarks": remark
             })
 
         updated_so_df = pl.DataFrame(so_rows)

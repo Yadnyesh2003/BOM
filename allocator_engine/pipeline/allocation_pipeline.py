@@ -189,15 +189,6 @@ class AllocationPipeline:
         bom_tree_obj = BOMTree(bom_df)
 
         # Choose allocator from config
-        # allocation_type = self.config.get("allocation_type", "partial")
-        # if allocation_type == "partial":
-        #     allocator = PartialComponentAllocator(
-        #         so_df,
-        #         bom_tree_obj,
-        #         stock_manager
-        #     )
-        #     output_df = allocator.allocate()
-        
         alloc_type = self.config["phases"]["component_allocation"]["type"]
 
         allocator_cls = COMPONENT_ALLOCATORS.get(alloc_type)
@@ -211,45 +202,11 @@ class AllocationPipeline:
         )
 
         output_df = allocator.allocate()
-
-        # else:
-        #     raise NotImplementedError(
-        #         f"Allocation type '{allocation_type}' not implemented"
-        #     )
-        #  Store output in pipeline data
+        data["so_df"] = allocator.so_df
         data["component_allocation_df"] = output_df
 
         return data
 
-
-    # def _write_outputs(self, data):
-    #     base_path = Path(self.config["base_path"])
-
-    #     # ---------------- ORDER ALLOCATION OUTPUTS ----------------
-    #     if self.config["phases"]["order_allocation"]["enabled"]:
-    #         order_out_dir = base_path / self.config["phases"]["order_allocation"]["output_path"]
-    #         order_out_dir.mkdir(parents=True, exist_ok=True)
-
-    #         # SO output (remaining qty)
-    #         so_file = order_out_dir / self.config["csv_inputs"]["so"]
-    #         write_csv(data["so_df"], so_file)
-
-    #         # Remaining stock
-    #         stock_file = order_out_dir / "Remaining_Stock.csv"
-    #         write_csv(data["stock_df"], stock_file)
-
-    #         print(f"Order allocation SO written to: {so_file}")
-    #         print(f"Remaining stock written to: {stock_file}")
-
-    #     # ---------------- COMPONENT ALLOCATION OUTPUTS ----------------
-    #     if self.config["phases"]["component_allocation"]["enabled"]:
-    #         comp_out_dir = base_path / self.config["phases"]["component_allocation"]["output_path"]
-    #         comp_out_dir.mkdir(parents=True, exist_ok=True)
-
-    #         comp_file = comp_out_dir / "component_allocation_output.csv"
-    #         write_csv(data["component_allocation_df"], comp_file)
-
-    #         print(f"Component allocation written to: {comp_file}")
 
     def _write_outputs(self, data):
         base_path = Path(self.config["base_path"])
@@ -278,5 +235,8 @@ class AllocationPipeline:
 
             comp_file = comp_out_dir / "component_allocation_output.csv"
             write_csv(data["component_allocation_df"], comp_file)
+
+            so_file = comp_out_dir / "orders_after_component_allocation.csv"
+            write_csv(data["so_df"], so_file)
 
             print(f"Component allocation written to: {comp_file}")

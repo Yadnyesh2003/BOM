@@ -1,14 +1,14 @@
-﻿Order_ID,Child,Plant,Parent,Stock
-,Chocolate Bar,Mumbai,Chocolate Bar,90
-,Moulded Chocolate,Mumbai,Chocolate Bar,10
-,Liquid Chocolate,Mumbai,Moulded Chocolate,70
-,Milk,Mumbai,Liquid Chocolate,70
-,Sugar,Mumbai,Liquid Chocolate,70
-,Coco Powder,Mumbai,Liquid Chocolate,70
-,Coco Beans,Mumbai,Coco Powder,70
-,Potato Chips Packet,Pune,Potato Chips Packet,50
-,Potato Chips,Pune,Potato Chips Packet,70
-,Potato Slices,Pune,Potato Chips,70
-,Palm Oil,Pune,Potato Chips,70
-,Salt,Pune,Potato Chips,70
-,Potato,Pune,Potato Slices,70
+order_id,item_id,plant,stock
+,Potato Chips,Pune,70.0
+,Moulded Chocolate,Mumbai,10.0
+,Coco Powder,Mumbai,70.0
+,Salt,Pune,70.0
+,Chocolate Bar,Mumbai,0.0
+,Potato Slices,Pune,70.0
+,Liquid Chocolate,Mumbai,70.0
+,Milk,Mumbai,70.0
+,Coco Beans,Mumbai,70.0
+,Potato Chips Packet,Pune,0.0
+,Sugar,Mumbai,70.0
+,Potato,Pune,70.0
+,Palm Oil,Pune,70.0

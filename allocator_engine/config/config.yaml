@@ -5,7 +5,7 @@ client: ISMT
 
 phases:
   order_allocation:
-    enabled: false
+    enabled: true
     type: partial
     input_source: input
     output_path: intermediate
@@ -44,5 +44,3 @@ schemas:
     child: Child
     comp_qty: BOM_Ratio_Of_Child
     plant: Plant
-
-# Order_ID,Child,Plant,Parent,Stock
