@@ -1,4 +1,3 @@
-from asyncio.log import logger
 from io_modules.reader import read_csv
 from io_modules.writer import write_csv
 from pathlib import Path
@@ -7,14 +6,7 @@ from pipeline.phase_registry import COMPONENT_ALLOCATORS
 from pipeline.phase_registry import ORDER_ALLOCATORS
 from common.stock_manager import StockManager
 from common.bom_tree import BOMTree
-from core.component_allocation.strategies.partial import PartialComponentAllocator
 from utils.schema_resolver import SchemaResolver
-
-REQUIRED_COLUMNS = {
-    "so": ["order_id", "fg_id", "plant", "order_qty"],
-    "stock": ["order_id", "fg_id", "item_id", "plant", "stock"],
-    "bom": ["root_parent", "plant", "parent", "child", "comp_qty"]
-}
 
 class AllocationPipeline:
     def __init__(self, config, logger):
@@ -33,18 +25,28 @@ class AllocationPipeline:
             )
             return
 
-        data = self._load_initial_inputs()
 
+        data = {}
+        # -------- ORDER ALLOCATION --------
         if phases["order_allocation"]["enabled"]:
+            alloc_type = phases["order_allocation"]["type"]
+            allocator_cls = ORDER_ALLOCATORS[alloc_type]
+            
+            self._read_phase_inputs("order_allocation", allocator_cls, data)
             data = self._run_order_allocation(data)
 
+        # -------- COMPONENT ALLOCATION --------
         if phases["component_allocation"]["enabled"]:
+            alloc_type = phases["component_allocation"]["type"]
+            allocator_cls = COMPONENT_ALLOCATORS[alloc_type]
+
+            self._read_phase_inputs("component_allocation", allocator_cls, data)
             data = self._run_component_allocation(data)
 
         self._write_outputs(data)
 
 
-    def _read_phase_inputs(self, phase_name: str) -> dict:
+    def _read_phase_inputs(self, phase_name: str, allocator_cls, data: dict) -> None:
         phase_cfg = self.config["phases"][phase_name]
         base_path = Path(self.config["base_path"])
         schemas = self.config["schemas"]
@@ -52,55 +54,33 @@ class AllocationPipeline:
         input_root = base_path / phase_cfg["input_source"]
         csv_cfg = phase_cfg["csv_inputs"]
 
-        data = {}
+        required_schemas = allocator_cls.resolved_required_schemas()
 
-        if "bom" in csv_cfg:
-            raw_dom_df = read_csv(input_root / csv_cfg["bom"])
-            data["bom_df"] = SchemaResolver.resolve(
-                df=raw_dom_df,
-                schema_cfg=schemas["bom"],
-                required_keys=REQUIRED_COLUMNS["bom"],
-                df_name="BOM",
+        for src, cols in required_schemas.items():
+            key = f"{src}_df"
+
+            # DO NOT overwrite outputs from previous phases
+            if key in data:
+                continue
+
+            # This phase does not provide this input
+            if src not in csv_cfg:
+                continue
+
+            raw_df = read_csv(input_root / csv_cfg[src])
+
+            data[key] = SchemaResolver.resolve(
+                df=raw_df,
+                schema_cfg=schemas[src],
+                required_keys=cols,
+                df_name=src.upper(),
                 logger=self.logger
             )
-
-        if "so" in csv_cfg:
-            raw_so_df = read_csv(input_root / csv_cfg["so"])
-            data["so_df"] = SchemaResolver.resolve(
-                df=raw_so_df,
-                schema_cfg=schemas["so"],
-                required_keys=REQUIRED_COLUMNS["so"],
-                df_name="SO",
-                logger=self.logger
-            )
-
-        if "stock" in csv_cfg:
-            raw_stock_df = read_csv(input_root / csv_cfg["stock"])
-            data["stock_df"] = SchemaResolver.resolve(
-                df=raw_stock_df,
-                schema_cfg=schemas["stock"],
-                required_keys=REQUIRED_COLUMNS["stock"],
-                df_name="Stock",
-                logger=self.logger
-            )
-
+            
         return data
 
 
     # -------- internal pipeline steps --------
-
-    def _load_initial_inputs(self):
-        data = {}
-
-        # Order Allocation inputs
-        if self.config["phases"]["order_allocation"]["enabled"]:
-            data.update(self._read_phase_inputs("order_allocation"))
-
-        # Component Allocation inputs (only if OrderAlloc is disabled)
-        elif self.config["phases"]["component_allocation"]["enabled"]:
-            data.update(self._read_phase_inputs("component_allocation"))
-
-        return data
 
     def _run_order_allocation(self, data):
         so_df = data["so_df"]

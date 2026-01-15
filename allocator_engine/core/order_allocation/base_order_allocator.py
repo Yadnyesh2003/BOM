@@ -20,3 +20,22 @@ class BaseOrderAllocator(ABC):
         - remaining_stock_df
         """
         pass
+
+    @classmethod
+    def base_required_schemas(cls):
+        return {
+            "so": ["order_id", "fg_id", "plant", "order_qty"],
+            "stock": ["order_id", "item_id", "plant", "stock"]
+        }
+
+    @classmethod
+    def extra_required_schemas(cls):
+        return {}
+
+    @classmethod
+    def resolved_required_schemas(cls):
+        merged = {k: list(v) for k, v in cls.base_required_schemas().items()}
+        for src, cols in cls.extra_required_schemas().items():
+            merged.setdefault(src, [])
+            merged[src].extend(cols)
+        return merged

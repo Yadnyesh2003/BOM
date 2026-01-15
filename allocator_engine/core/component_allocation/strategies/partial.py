@@ -13,6 +13,11 @@ class PartialComponentAllocator(BaseComponentAllocator):
     Adds order-level component allocation remarks into so_df.
     """
 
+    @classmethod
+    def extra_required_schemas(cls):
+        return {}
+
+
     def allocate(self) -> pl.DataFrame:
         order_remarks: dict[str, str] = {}
 

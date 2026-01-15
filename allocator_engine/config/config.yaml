@@ -10,7 +10,6 @@ phases:
     input_source: input
     output_path: intermediate
     csv_inputs:
-      bom: BOM_Input.csv
       so: OID_QTY_RP.csv
       stock: Production_Report.csv
 
@@ -44,3 +43,23 @@ schemas:
     child: Child
     comp_qty: BOM_Ratio_Of_Child
     plant: Plant
+
+
+# schemas:
+#   so:
+#     order_id: order_id
+#     fg_id: fg_id
+#     order_qty: order_qty
+#     plant: plant
+#   stock:
+#     order_id: order_id
+#     fg_id: parent
+#     item_id: item_id
+#     plant: plant
+#     stock: stock
+#   bom:
+#     root_parent: Finished_Good
+#     parent: Parent
+#     child: Child
+#     comp_qty: BOM_Ratio_Of_Child
+#     plant: Plant

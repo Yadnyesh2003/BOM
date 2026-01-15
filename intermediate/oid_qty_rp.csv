@@ -1,4 +1,58 @@
 order_id,plant,fg_id,order_qty,order_allocation_remarks,component_allocation_remarks
-100-1,Mumbai,Chocolate Bar,160.0,Stock found for FG 'Chocolate Bar'. Allocated 90.0 out of 250.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+100-1,Mumbai,Chocolate Bar,145.0,Stock found for FG 'Chocolate Bar'. Allocated 105.0 out of 250.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
 100-2,Delhi,Noodles,100.0,No stock found for FG 'Noodles'. Allocated 0 out of 100.0.,BOM not present for FG 'Noodles' at Plant 'Delhi'. Order skipped.
-101-2,Pune,Potato Chips Packet,250.0,Stock found for FG 'Potato Chips Packet'. Allocated 50.0 out of 300.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+101-2,Pune,Potato Chips Packet,260.0,Stock found for FG 'Potato Chips Packet'. Allocated 40.0 out of 300.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+200-1,Mumbai,Chocolate Bar,200.0,Stock found for FG 'Chocolate Bar'. Allocated 50.0 out of 250.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+200-2,Delhi,Chocolate Bar,100.0,No stock found for FG 'Chocolate Bar'. Allocated 0 out of 100.0.,BOM not present for FG 'Chocolate Bar' at Plant 'Delhi'. Order skipped.
+200-3,Mumbai,Chocolate Bar,0.0,No stock found for FG 'Chocolate Bar'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+200-4,Mumbai,Chocolate Bar,12.5,No stock found for FG 'Chocolate Bar'. Allocated 0 out of 12.5.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+200-5,Mumbai,Chocolate Bar,-20.0,No stock found for FG 'Chocolate Bar'. Allocated 0 out of -20.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+200-6,Mumbai,Liquid Chocolate,20.0,Stock found for FG 'Liquid Chocolate'. Allocated 20.0 out of 40.0.,BOM not present for FG 'Liquid Chocolate' at Plant 'Mumbai'. Order skipped.
+201-1,Pune,Potato Chips Packet,285.0,Stock found for FG 'Potato Chips Packet'. Allocated 15.0 out of 300.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+201-2,Pune,Potato Chips Packet,150.0,No stock found for FG 'Potato Chips Packet'. Allocated 0 out of 150.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+201-3,Mumbai,Potato Chips Packet,200.0,No stock found for FG 'Potato Chips Packet'. Allocated 0 out of 200.0.,BOM not present for FG 'Potato Chips Packet' at Plant 'Mumbai'. Order skipped.
+201-4,Pune,Potato Chips Packet,0.0,No stock found for FG 'Potato Chips Packet'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+201-5,Pune,Potato Chips Packet,1000000.0,No stock found for FG 'Potato Chips Packet'. Allocated 0 out of 1000000.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+201-6,Pune,Potato Slices,25.0,No stock found for FG 'Potato Slices'. Allocated 0 out of 25.0.,BOM not present for FG 'Potato Slices' at Plant 'Pune'. Order skipped.
+202-1,Nashik,Flavored Milk Bottle,380.0,Stock found for FG 'Flavored Milk Bottle'. Allocated 120.0 out of 500.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+202-2,Mumbai,Flavored Milk Bottle,120.0,No stock found for FG 'Flavored Milk Bottle'. Allocated 0 out of 120.0.,BOM not present for FG 'Flavored Milk Bottle' at Plant 'Mumbai'. Order skipped.
+202-3,Nashik,Flavored Milk Bottle,0.0,No stock found for FG 'Flavored Milk Bottle'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+202-4,Nashik,Flavored Milk Bottle,18.75,No stock found for FG 'Flavored Milk Bottle'. Allocated 0 out of 18.75.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+202-5,Nashik,Sugar Syrup,0.0,Stock found for FG 'Sugar Syrup'. Allocated 30.0 out of 30.0.,BOM not present for FG 'Sugar Syrup' at Plant 'Nashik'. Order skipped.
+203-1,Noida,Frozen Pizza,310.0,Stock found for FG 'Frozen Pizza'. Allocated 90.0 out of 400.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+203-2,Delhi,Frozen Pizza,250.0,No stock found for FG 'Frozen Pizza'. Allocated 0 out of 250.0.,BOM not present for FG 'Frozen Pizza' at Plant 'Delhi'. Order skipped.
+203-3,Noida,Frozen Pizza,0.0,No stock found for FG 'Frozen Pizza'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+203-4,Noida,Pizza Base,0.0,Stock found for FG 'Pizza Base'. Allocated 33.3 out of 33.3.,BOM not present for FG 'Pizza Base' at Plant 'Noida'. Order skipped.
+203-5,Noida,Cheese Blend,30.0,Stock found for FG 'Cheese Blend'. Allocated 30.0 out of 60.0.,BOM not present for FG 'Cheese Blend' at Plant 'Noida'. Order skipped.
+204-1,Indore,Cream Biscuit Pack,290.0,Stock found for FG 'Cream Biscuit Pack'. Allocated 60.0 out of 350.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+204-2,Indore,Cream Biscuit Pack,150.0,No stock found for FG 'Cream Biscuit Pack'. Allocated 0 out of 150.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+204-3,Bhopal,Cream Biscuit Pack,200.0,No stock found for FG 'Cream Biscuit Pack'. Allocated 0 out of 200.0.,BOM not present for FG 'Cream Biscuit Pack' at Plant 'Bhopal'. Order skipped.
+204-4,Indore,Cream Biscuit Pack,0.0,No stock found for FG 'Cream Biscuit Pack'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+204-5,Indore,Cream Filling,0.5,Stock found for FG 'Cream Filling'. Allocated 45.0 out of 45.5.,BOM not present for FG 'Cream Filling' at Plant 'Indore'. Order skipped.
+205-1,Baddi,Shampoo Bottle,450.0,Stock found for FG 'Shampoo Bottle'. Allocated 150.0 out of 600.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+205-2,Baddi,Shampoo Bottle,0.0,No stock found for FG 'Shampoo Bottle'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+205-3,Hyderabad,Shampoo Bottle,180.0,No stock found for FG 'Shampoo Bottle'. Allocated 0 out of 180.0.,BOM not present for FG 'Shampoo Bottle' at Plant 'Hyderabad'. Order skipped.
+205-4,Baddi,Shampoo Base,0.0,Stock found for FG 'Shampoo Base'. Allocated 22.25 out of 22.25.,BOM not present for FG 'Shampoo Base' at Plant 'Baddi'. Order skipped.
+205-5,Baddi,Fragrance,0.0,Stock found for FG 'Fragrance'. Allocated -10.0 out of -10.0.,BOM not present for FG 'Fragrance' at Plant 'Baddi'. Order skipped.
+206-1,Surat,Chocolate Cookies,195.0,Stock found for FG 'Chocolate Cookies'. Allocated 80.0 out of 275.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+206-2,Surat,Chocolate Cookies,125.0,No stock found for FG 'Chocolate Cookies'. Allocated 0 out of 125.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+206-3,Mumbai,Chocolate Cookies,90.0,No stock found for FG 'Chocolate Cookies'. Allocated 0 out of 90.0.,BOM not present for FG 'Chocolate Cookies' at Plant 'Mumbai'. Order skipped.
+206-4,Surat,Chocolate Cookies,0.0,No stock found for FG 'Chocolate Cookies'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+206-5,Surat,Chocolate Chips,0.0,Stock found for FG 'Chocolate Chips'. Allocated 15.75 out of 15.75.,BOM not present for FG 'Chocolate Chips' at Plant 'Surat'. Order skipped.
+207-1,Delhi,Orange Juice Bottle,600.0,Stock found for FG 'Orange Juice Bottle'. Allocated 200.0 out of 800.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+207-2,Delhi,Orange Juice Bottle,0.0,No stock found for FG 'Orange Juice Bottle'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+207-3,Mumbai,Orange Juice Bottle,300.0,No stock found for FG 'Orange Juice Bottle'. Allocated 0 out of 300.0.,BOM not present for FG 'Orange Juice Bottle' at Plant 'Mumbai'. Order skipped.
+207-4,Delhi,Orange Juice Concentrate,0.0,Stock found for FG 'Orange Juice Concentrate'. Allocated 42.5 out of 42.5.,BOM not present for FG 'Orange Juice Concentrate' at Plant 'Delhi'. Order skipped.
+208-1,Bangalore,White Bread Loaf,390.0,Stock found for FG 'White Bread Loaf'. Allocated 110.0 out of 500.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+208-2,Bangalore,White Bread Loaf,0.0,No stock found for FG 'White Bread Loaf'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+208-3,Chennai,White Bread Loaf,220.0,No stock found for FG 'White Bread Loaf'. Allocated 0 out of 220.0.,BOM not present for FG 'White Bread Loaf' at Plant 'Chennai'. Order skipped.
+208-4,Bangalore,Bread Dough,0.0,Stock found for FG 'Bread Dough'. Allocated 60.0 out of 60.0.,BOM not present for FG 'Bread Dough' at Plant 'Bangalore'. Order skipped.
+209-1,Hyderabad,Toothpaste Tube,320.0,Stock found for FG 'Toothpaste Tube'. Allocated 130.0 out of 450.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+209-2,Hyderabad,Toothpaste Tube,0.0,No stock found for FG 'Toothpaste Tube'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+209-3,Pune,Toothpaste Tube,175.0,No stock found for FG 'Toothpaste Tube'. Allocated 0 out of 175.0.,BOM not present for FG 'Toothpaste Tube' at Plant 'Pune'. Order skipped.
+209-4,Hyderabad,Toothpaste Paste,0.0,Stock found for FG 'Toothpaste Paste'. Allocated 27.8 out of 27.8.,BOM not present for FG 'Toothpaste Paste' at Plant 'Hyderabad'. Order skipped.
+210-1,Chennai,Instant Coffee Jar,305.0,Stock found for FG 'Instant Coffee Jar'. Allocated 75.0 out of 380.0.,Order processed via component allocation. BOM exploded and stock allocation attempted.
+210-2,Chennai,Instant Coffee Jar,0.0,No stock found for FG 'Instant Coffee Jar'. Allocated 0 out of 0.0.,Order quantity is zero; BOM exploded without allocation. | Order processed via component allocation. BOM exploded and stock allocation attempted.
+210-3,Bangalore,Instant Coffee Jar,140.0,No stock found for FG 'Instant Coffee Jar'. Allocated 0 out of 140.0.,BOM not present for FG 'Instant Coffee Jar' at Plant 'Bangalore'. Order skipped.
+210-4,Chennai,Instant Coffee Powder,0.0,Stock found for FG 'Instant Coffee Powder'. Allocated 19.6 out of 19.6.,BOM not present for FG 'Instant Coffee Powder' at Plant 'Chennai'. Order skipped.
+211-1,Mumbai,Biscuits,100.0,No stock found for FG 'Biscuits'. Allocated 0 out of 100.0.,BOM not present for FG 'Biscuits' at Plant 'Mumbai'. Order skipped.

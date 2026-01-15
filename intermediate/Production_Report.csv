@@ -1,14 +1,79 @@
 order_id,item_id,plant,stock
+206-1,Chocolate Cookies,Surat,0.0
+207-1,Orange Juice Bottle,Delhi,0.0
+205-1,Shampoo Bottle,Baddi,0.0
+200-1,Moulded Chocolate,Mumbai,30.0
+200-1,Liquid Chocolate,Mumbai,40.0
+101-2,Potato Slices,Pune,45.0
+201-5,Potato Slices,Pune,300000.0
+201-5,Palm Oil,Pune,150000.0
+101-2,Potato Chips Packet,Pune,0.0
+100-1,Liquid Chocolate,Mumbai,60.0
+203-1,Frozen Pizza,Noida,0.0
+209-1,Toothpaste Tube,Hyderabad,0.0
+204-1,Cream Biscuit Pack,Indore,0.0
+208-1,White Bread Loaf,Bangalore,0.0
+201-5,Potato Chips,Pune,500000.0
+100-1,Moulded Chocolate,Mumbai,40.0
+200-1,Chocolate Bar,Mumbai,0.0
+999-9,Test Component,TestPlant,999.0
+210-1,Instant Coffee Jar,Chennai,0.0
+,Coco Powder,Mumbai,25.0
+,Rubber Gasket,Mumbai,500.0
 ,Potato Chips,Pune,70.0
-,Moulded Chocolate,Mumbai,10.0
-,Coco Powder,Mumbai,70.0
-,Salt,Pune,70.0
 ,Chocolate Bar,Mumbai,0.0
-,Potato Slices,Pune,70.0
-,Liquid Chocolate,Mumbai,70.0
-,Milk,Mumbai,70.0
-,Coco Beans,Mumbai,70.0
+,Sugar,Surat,50.0
+,Calcium Carbonate,Hyderabad,160.0
+,Cream Filling,Indore,0.0
+,Coffee Extract,Chennai,45.0
+,Liquid Chocolate,Mumbai,0.0
+,Pizza Base,Noida,36.7
+,Fragrance,Baddi,35.0
+,Sugar,Mumbai,30.0
+,Water,Noida,40.0
+,Water,Bangalore,70.0
+,Cheese Blend,Noida,0.0
+,Glass Jar,Chennai,180.0
+,Plastic Bottle,Baddi,200.0
+,Chocolate Chips,Surat,14.25
+,Cookie Dough,Surat,70.0
+,Coffee Beans,Chennai,100.0
+,Sugar Syrup,Nashik,10.0
+,Wheat Flour,Bangalore,140.0
+,Moulded Chocolate,Mumbai,10.0
+,Flavor Essence,Nashik,10.0
+,Sugar,Indore,60.0
+,Water,Nashik,100.0
+,Wheat Flour,Surat,100.0
+,Coco Beans,Mumbai,80.0
+,Yeast,Bangalore,10.0
+,Palm Oil,Pune,20.0
+,Instant Coffee Powder,Chennai,40.4
+,Steel Screw,Pune,1000.0
+,Sugar,Nashik,60.0
+,Yeast,Noida,5.0
+,Flavored Milk Bottle,Nashik,0.0
+,Pizza Topping,Noida,50.0
+,Chocolate Liquor,Surat,20.0
+,Shampoo Base,Baddi,67.75
+,Fluoride Compound,Hyderabad,8.0
+,Wheat Flour,Noida,80.0
+,Surfactant Blend,Baddi,120.0
+,Wheat Flour,Indore,120.0
+,Milk,Mumbai,50.0
+,Palm Oil,Indore,40.0
+,Toothpaste Paste,Hyderabad,67.2
+,Bread Dough,Bangalore,25.0
+,Orange Pulp,Delhi,90.0
+,Salt,Pune,5.0
+,Orange Juice Concentrate,Delhi,107.5
+,Plastic Bottle,Delhi,300.0
+,Milk,Nashik,200.0
 ,Potato Chips Packet,Pune,0.0
-,Sugar,Mumbai,70.0
-,Potato,Pune,70.0
-,Palm Oil,Pune,70.0
+,Water,Delhi,60.0
+,Potato,Pune,90.0
+,Biscuit Shell,Indore,100.0
+,Water,Baddi,300.0
+,Flavored Milk Base,Nashik,80.0
+,HDPE Granules,Baddi,500.0
+,Plastic Tube,Hyderabad,220.0

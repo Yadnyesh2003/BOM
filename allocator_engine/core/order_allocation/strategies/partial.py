@@ -8,6 +8,10 @@ class PartialOrderAllocator(BaseOrderAllocator):
     Supports SO-level stock and ITEM-level stock.
     """
 
+    @classmethod
+    def extra_required_schemas(cls):
+        return {}
+
     def allocate(self):
         so_rows = []
 
