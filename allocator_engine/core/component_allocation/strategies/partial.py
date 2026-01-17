@@ -43,12 +43,6 @@ class PartialComponentAllocator(BaseComponentAllocator):
             plant = str(r["plant"]).strip()
             fg_qty = float(r.get("order_qty") or 0.0)
 
-            # BOM validation
-            # if (fg, plant) not in self.bom_tree.bom_tree_map:
-            #     logger.warning("Skipping order %s: BOM not found for FG=%s Plant=%s", so_id, fg, plant)
-            #     add_remark(so_id, f"BOM not present for FG '{fg}' at Plant '{plant}'. Order skipped.")
-            #     continue
-
             resolved_root, bom_tree, resolution_type = self.bom_tree.resolve_fg(fg, plant)
 
             if resolution_type == "NOT_FOUND":
@@ -90,7 +84,14 @@ class PartialComponentAllocator(BaseComponentAllocator):
                 order_qty = float(current["order_qty"] or 0.0)
 
                 if order_qty > 0:
-                    available = self.stock_manager.get_stock(plant, so_id, item)
+                    if not self.stock_manager.has_stock(plant, so_id, item):
+                        add_remark(
+                            so_id,
+                            f"No stock data for child component '{item}' at plant '{plant}'."
+                        )
+                        available = 0
+                    else:
+                        available = self.stock_manager.get_stock(plant, so_id, item)
                     allocated = min(order_qty, available)
                     if self.config.get("round_allocation", False):
                         allocated = round(allocated, 2)

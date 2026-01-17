@@ -32,8 +32,8 @@ schemas:
     order_qty: Order_Qty
     plant: Plant
   stock:
-    order_id: Order_ID
-    fg_id: Parent
+    order_id: order_ID
+    fg_id: parenT 
     item_id: Child
     plant: Plant
     stock: Stock

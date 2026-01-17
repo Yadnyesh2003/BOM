@@ -43,6 +43,24 @@ flowchart LR
     MAIN["main.py\n(Entry Point)"] --> CFG["config.yaml\n(Behavior Control)"] & PIPE["AllocationPipeline\n(Facade / Orchestrator)"]
     PIPE --> IO["Reader / Writer\n(CSV I/O)"] & SR["SchemaResolver\n(Schema Validation & Mapping)"] & OA["Order Allocation Phase"] & CA["Component Allocation Phase"]
 ```
+### Explanation:
+- **main.py** — bootstrap: load config, set up logger, run pipeline.
+
+- **AllocationPipeline** (`pipeline/allocation_pipeline.py`) — orchestrates phases and data flow.
+
+- **Phase Registry** (`pipeline/phase_registry.py`) — maps config type → concrete strategy.
+
+- **Order Allocators** (`core/order_allocation/`) — strategies for SO-level allocation.
+
+- **Component Allocators** (`core/component_allocation/`) — BOM explosion logic + allocation.
+
+- **StockManager** (`common/stock_manager.py`) — single source of stock truth for the run.
+
+- **BOMTree** (`common/bom_tree.py`) — precomputed BOM tree keyed by (Finished_Good, Plant).
+
+- **SchemaResolver** (`utils/schema_resolver.py`) — validates and renames CSV columns according to config schemas.
+
+- **EngineLogger** (`utils/logger.py`) — run-based logger writing normal + error logs.
 
 ---
 
@@ -52,6 +70,56 @@ The system processes data through a predictable lifecycle:
 Input → Schema Validation → Allocation Phases → Output
 ```
 Depending on configuration, an intermediate layer may be introduced between phases.
+
+---
+
+### Input Ingestion
+- Pipeline reads one or more CSV inputs.
+- CSV headers are resolved using a `SchemaResolver` to normalize column names.
+
+---
+
+### Order Allocation (Optional)
+- Loads stock data via `StockManager`.
+- Aggregates stock at:
+  - Sales Order (SO) level
+  - Item level
+- Executes an Order Allocation strategy:
+  - Allocates available stock to sales orders
+  - Produces:
+    - Updated sales orders
+    - Remaining (unallocated) stock
+- `StockManager` is mutated to reflect post–order allocation stock state.
+
+---
+
+### Component Allocation (Optional)
+- Builds a `BOMTree` from BOM master data.
+
+#### BOMTree Responsibilities
+- Organizes BOMs uniquely by `(Finished_Good, Plant)`.
+- Constructs a hierarchical parent → child BOM structure per FG and plant.
+- Maintains a reverse lookup index to resolve:
+  - Semi-Finished Goods (SFGs): Orders can be placed on SFG
+  - Intermediate components
+  back to their root Finished Good.
+- Provides BOM resolution utilities for downstream allocation logic.
+
+#### Component Allocation Flow
+- Uses the mutated `StockManager` from Order Allocation.
+- Resolves the appropriate BOM using `BOMTree.resolve_fg(fg, plant)`:
+  - `ROOT` → FG is a top-level finished good
+  - `SFG` → FG is an intermediate material mapped to a root FG
+  - `NOT_FOUND` → No applicable BOM exists
+- Component Allocation strategy:
+  - Traverses (explodes) the resolved BOM tree
+  - Computes required component quantities using BOM ratios
+  - Allocates available component stock accordingly
+
+---
+
+### Output Generation
+- Writes allocation results and residual stock data to configured output paths.
 
 ---
 
@@ -251,14 +319,11 @@ Pipeline ->> CompAlloc: allocate()
 CompAlloc ->> BOM: resolve FG / SFG
 CompAlloc ->> Stock: get / set stock
 Pipeline ->> Main: write outputs
-
 ```
 
-## 9. Architectural Benefits
-- Highly extensible and strategy-safe  
-- Easy to test and reason about  
-- Clean separation of concerns  
-- Suitable for real-world manufacturing systems  
-- Interview-grade use of OOP principles and design patterns
-
 ---
+
+## 9. How to Extend the ETL Pipeline with New Allocation Strategies?
+
+New allocation strategies implement abstract base classes in  
+`core/*/base_*_allocator.py` and are registered in `phase_registry.py`.
