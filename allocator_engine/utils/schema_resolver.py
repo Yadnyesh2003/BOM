@@ -70,8 +70,6 @@ class SchemaResolver:
         df = df.rename(rename_map)
         # Drop unwanted columns
         df = df.select(required_keys)
-        logger.debug(
-            f"{df_name} schema resolved. Columns: {df.columns}"
-        )
+        logger.debug("%s schema resolved. Columns: %s", df_name, df.columns)
 
         return df

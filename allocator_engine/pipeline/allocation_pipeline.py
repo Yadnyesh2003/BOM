@@ -31,6 +31,7 @@ class AllocationPipeline:
         if phases["order_allocation"]["enabled"]:
             alloc_type = phases["order_allocation"]["type"]
             allocator_cls = ORDER_ALLOCATORS[alloc_type]
+            self.logger.info("Order Allocation Phase started for %s Allocation", alloc_type.capitalize())
             
             self._read_phase_inputs("order_allocation", allocator_cls, data)
             data = self._run_order_allocation(data)
@@ -39,6 +40,7 @@ class AllocationPipeline:
         if phases["component_allocation"]["enabled"]:
             alloc_type = phases["component_allocation"]["type"]
             allocator_cls = COMPONENT_ALLOCATORS[alloc_type]
+            self.logger.info("Component Allocation Phase started for %s Allocation", alloc_type.capitalize())
 
             self._read_phase_inputs("component_allocation", allocator_cls, data)
             data = self._run_component_allocation(data)
@@ -47,6 +49,7 @@ class AllocationPipeline:
 
 
     def _read_phase_inputs(self, phase_name: str, allocator_cls, data: dict) -> None:
+        self.logger.info("Reading Input Files...")
         phase_cfg = self.config["phases"][phase_name]
         base_path = Path(self.config["base_path"])
         schemas = self.config["schemas"]
@@ -73,10 +76,10 @@ class AllocationPipeline:
                 df=raw_df,
                 schema_cfg=schemas[src],
                 required_keys=cols,
-                df_name=src.upper(),
+                df_name=f"{src.upper()} FILE",
                 logger=self.logger
-            )
-            
+            )    
+        self.logger.info("All Input Files Read Successfully")    
         return data
 
 
@@ -93,6 +96,7 @@ class AllocationPipeline:
             pl.col("plant").cast(pl.Utf8).str.strip_chars(),
             pl.col("stock").fill_null(0).cast(pl.Float64)
         ])
+        self.logger.info("Stock Data Cleaned")
 
         # SO-level FG stock
         so_stock_df = (
@@ -109,18 +113,27 @@ class AllocationPipeline:
             .group_by(["plant", "item_id"])
             .agg(pl.sum("stock").alias("stock"))
         )
-
-        stock_manager = StockManager()
+        self.logger.info("Stock Aggregation Completed.")
+        stock_manager = StockManager(self.logger)
         stock_manager.load_stock(so_stock_df, item_stock_df)
+        self.logger.info("Loaded Stock Data in Stock Manager.")
 
         alloc_type = self.config["phases"]["order_allocation"]["type"]
         allocator_cls = ORDER_ALLOCATORS.get(alloc_type)
+        if not allocator_cls:
+            self.logger.error("Unsupported Order Allocation type: %s", alloc_type)
+            raise ValueError(f"Unsupported Order Allocation type: {alloc_type}")
 
-        allocator = allocator_cls(so_df, stock_manager)
+        allocator = allocator_cls(so_df, stock_manager, logger=self.logger)
+        self.logger.info("Running %s Order Allocation...", alloc_type.capitalize())
         updated_so_df, remaining_stock_df = allocator.allocate()
+        self.logger.info("%s Order Allocation Completed.", alloc_type.capitalize())
 
         data["so_df"] = updated_so_df
         data["stock_df"] = remaining_stock_df
+
+        self.logger.info("Updated SO and Stock Data Stored in Pipeline Data.")
+        self.logger.info("Order Allocation Phase Completed.")
 
         return data
 
@@ -149,6 +162,8 @@ class AllocationPipeline:
             pl.col("stock").fill_null(0).cast(pl.Float64)
         ])
 
+        self.logger.info("BOM & STOCK Data Cleaned.")
+
         # Aggregate stock
         so_stock_df = (
             stock_df
@@ -163,60 +178,84 @@ class AllocationPipeline:
             .agg(pl.sum("stock").alias("stock"))
         )
 
+        self.logger.info("Stock Aggregation Completed.")
+
         # Initialize StockManager & BOMTree
-        stock_manager = StockManager()
+        stock_manager = StockManager(self.logger)
         stock_manager.load_stock(so_stock_df, item_stock_df)
+        self.logger.info("Loaded Stock Data in Stock Manager.")
         bom_tree_obj = BOMTree(bom_df)
+        self.logger.info("BOMTree initialized successfully with %d BOM roots.",len(bom_tree_obj.bom_tree_map))
+
 
         # Choose allocator from config
         alloc_type = self.config["phases"]["component_allocation"]["type"]
 
         allocator_cls = COMPONENT_ALLOCATORS.get(alloc_type)
         if not allocator_cls:
-            raise ValueError(f"Unsupported component allocation type: {alloc_type}")
+            self.logger.error("Unsupported Component Allocation type: %s", alloc_type)
+            raise ValueError(f"Unsupported Component Allocation type: {alloc_type}")
 
         allocator = allocator_cls(
             so_df,
             bom_tree_obj,
-            stock_manager
+            stock_manager,
+            logger=self.logger
         )
-
+        self.logger.info("Running %s Partial Allocation...", alloc_type.capitalize())
         output_df = allocator.allocate()
+        self.logger.info("%s Partial Allocation Completed.", alloc_type.capitalize())
         data["so_df"] = allocator.so_df
         data["component_allocation_df"] = output_df
-
+        self.logger.info("Updated SO and Component Allocation Data")
+        self.logger.info("Component Allocation Phase Completed.")
         return data
 
 
     def _write_outputs(self, data):
-        base_path = Path(self.config["base_path"])
+        try: 
+            base_path = Path(self.config["base_path"])
+            self.logger.info("Starting output write phase.")
 
-        # ---------------- ORDER ALLOCATION OUTPUTS ----------------
-        if self.config["phases"]["order_allocation"]["enabled"]:
-            order_cfg = self.config["phases"]["order_allocation"]
-            order_out_dir = base_path / order_cfg["output_path"]
-            order_out_dir.mkdir(parents=True, exist_ok=True)
+            # ---------------- ORDER ALLOCATION OUTPUTS ----------------
+            if self.config["phases"]["order_allocation"]["enabled"]:
+                order_cfg = self.config["phases"]["order_allocation"]
+                order_out_dir = base_path / order_cfg["output_path"]
+                order_out_dir.mkdir(parents=True, exist_ok=True)
+                self.logger.debug("Order allocation output directory ready: %s", order_out_dir)
 
-            so_filename = order_cfg["csv_inputs"]["so"]
-            so_file = order_out_dir / so_filename
-            write_csv(data["so_df"], so_file)
+                so_filename = order_cfg["csv_inputs"]["so"]
+                so_file = order_out_dir / so_filename
+                write_csv(data["so_df"], so_file)
+                self.logger.info("Order allocation SO written: %s (rows=%d)", so_file, data["so_df"].height)
 
-            stock_file = order_out_dir / order_cfg["csv_inputs"]["stock"]
-            write_csv(data["stock_df"], stock_file)
+                stock_file = order_out_dir / order_cfg["csv_inputs"]["stock"]
+                write_csv(data["stock_df"], stock_file)
+                self.logger.info("Remaining stock written: %s (rows=%d)", stock_file, data["stock_df"].height)
 
-            print(f"Order allocation SO written to: {so_file}")
-            print(f"Remaining stock written to: {stock_file}")
+            else:
+                self.logger.info("Order allocation output skipped (phase disabled).")
 
-        # ---------------- COMPONENT ALLOCATION OUTPUTS ----------------
-        if self.config["phases"]["component_allocation"]["enabled"]:
-            comp_cfg = self.config["phases"]["component_allocation"]
-            comp_out_dir = base_path / comp_cfg["output_path"]
-            comp_out_dir.mkdir(parents=True, exist_ok=True)
+            # ---------------- COMPONENT ALLOCATION OUTPUTS ----------------
+            if self.config["phases"]["component_allocation"]["enabled"]:
+                comp_cfg = self.config["phases"]["component_allocation"]
+                comp_out_dir = base_path / comp_cfg["output_path"]
+                comp_out_dir.mkdir(parents=True, exist_ok=True)
+                self.logger.debug("Component allocation output directory ready: %s", comp_out_dir)
 
-            comp_file = comp_out_dir / "component_allocation_output.csv"
-            write_csv(data["component_allocation_df"], comp_file)
+                comp_file = comp_out_dir / "component_allocation_output.csv"
+                write_csv(data["component_allocation_df"], comp_file)
+                self.logger.info("Component Allocation output written: %s (rows=%d)", comp_file, data["component_allocation_df"].height)
 
-            so_file = comp_out_dir / "orders_after_component_allocation.csv"
-            write_csv(data["so_df"], so_file)
+                so_file = comp_out_dir / "orders_after_component_allocation.csv"
+                write_csv(data["so_df"], so_file)
+                self.logger.info("SO Data after Component Allocation written: %s (rows=%d)", so_file, data["so_df"].height)
+            
+            else:
+                self.logger.info("Component allocation output skipped (phase disabled).")
 
-            print(f"Component allocation written to: {comp_file}")
+            self.logger.info("Output write phase completed.")
+
+        except Exception as e:
+            self.logger.critical("Failed to write output files: %s", str(e), exc_info=True)
+            raise

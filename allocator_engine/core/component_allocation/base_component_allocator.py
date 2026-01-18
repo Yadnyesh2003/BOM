@@ -9,7 +9,7 @@ class BaseComponentAllocator(ABC):
     Defines the interface that every allocator must implement.
     """
 
-    def __init__(self, so_df: pl.DataFrame, bom_tree: BOMTree, stock_manager: StockManager, config=None):
+    def __init__(self, so_df: pl.DataFrame, bom_tree: BOMTree, stock_manager: StockManager, config=None, logger=None) -> None:
         """
         :param so_df: Sales order dataframe
         :param bom_tree: BOMTree object with precomputed BOM
@@ -19,6 +19,7 @@ class BaseComponentAllocator(ABC):
         self.bom_tree = bom_tree
         self.stock_manager = stock_manager
         self.config = config or {}
+        self.logger = logger
 
     @abstractmethod
     def allocate(self) -> pl.DataFrame:

@@ -1,7 +1,7 @@
+from asyncio.log import logger
 import logging
 from pathlib import Path
 from datetime import datetime
-import traceback
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
@@ -38,19 +38,19 @@ class EngineLogger:
         logger.setLevel(self.level)
         logger.propagate = False
 
-        formatter = logging.Formatter("%(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s | %(levelname)s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
 
-        # Normal log (INFO+)
         normal_handler = logging.FileHandler(self.normal_log_file, mode="a")
         normal_handler.setLevel(self.level)
         normal_handler.setFormatter(formatter)
 
-        # Error log (ERROR only)
         error_handler = logging.FileHandler(self.error_log_file, mode="a")
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
 
-        # Console
         console_handler = logging.StreamHandler()
         console_handler.setLevel(self.level)
         console_handler.setFormatter(formatter)
@@ -61,39 +61,40 @@ class EngineLogger:
 
         return logger
 
+
     # ---------------- HEADER / FOOTER ----------------
     def _write_run_header(self):
         header = (
             f"Today's Date : {self.run_date}\n"
             f"Client : {self.client}\n"
             f"Run Started At : {self.run_dt.strftime('%H:%M:%S')}\n"
-            f"{'-'*60}"
+            f"{'-'*100}"
         )
         self.logger.info(header)
 
     def write_run_footer(self):
         footer = (
-            f"\n{'-'*60}\n"
             f"Run Ended At : {datetime.now().strftime('%H:%M:%S')}\n"
+            f"{'-'*100}"
         )
-        self.logger.info(footer)
+        self.logger.info(footer, extra={"end": "\n"})
 
     # ---------------- PUBLIC METHODS ----------------
-    def info(self, msg: str):
-        self.logger.info(msg)
+    def info(self, msg: str, *args):
+        self.logger.info(msg, *args)
 
-    def warning(self, msg: str):
-        self.logger.warning(msg)
+    def warning(self, msg: str, *args):
+        self.logger.warning(msg, *args)
 
-    def error(self, msg: str, exc_info=False):
-        self.logger.error(msg, exc_info=exc_info)
+    def error(self, msg: str, exc_info=False, *args):
+        self.logger.error(msg, exc_info=exc_info, *args)
 
-    def debug(self, msg: str):
-        self.logger.debug(msg)
+    def debug(self, msg: str, *args):
+        self.logger.debug(msg, *args)
 
-    def critical(self, msg: str, exc_info=False):
-        self.logger.critical(msg, exc_info=exc_info)
+    def critical(self, msg: str, exc_info=False, *args):
+        self.logger.critical(msg, exc_info=exc_info, *args)
 
-    def exception(self, msg: str):
-        self.logger.exception(msg)
+    def exception(self, msg: str, *args):
+        self.logger.exception(msg, *args)
 

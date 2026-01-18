@@ -34,12 +34,12 @@ logger = EngineLogger(
 # Run pipeline
 # --------------------------------------------------
 try:
-    logger.info("Starting allocation pipeline")
+    logger.info("Starting Allocation Pipeline...")
 
     pipeline = AllocationPipeline(config, logger)
     pipeline.run()
 
-    logger.info("Pipeline completed successfully")
+    logger.info("Pipeline completed successfully!!!")
 
 except Exception:
     logger.critical("Fatal pipeline error occurred", exc_info=True)
