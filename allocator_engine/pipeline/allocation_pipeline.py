@@ -300,6 +300,10 @@ class AllocationPipeline:
                 so_file = comp_out_dir / "orders_after_component_allocation.csv"
                 write_csv(data["so_df"], so_file)
                 self.logger.info("SO Data after Component Allocation written: %s (rows=%d)", so_file, data["so_df"].height)
+
+                stock_file = comp_out_dir / "remaining_stock_after_component_allocation.csv"
+                write_csv(data["stock_df"], stock_file)
+                self.logger.info("Remaining stock after Component Allocation written: %s (rows=%d)", stock_file, data["stock_df"].height)
             
             else:
                 self.logger.info("Component allocation output skipped (phase disabled).")
