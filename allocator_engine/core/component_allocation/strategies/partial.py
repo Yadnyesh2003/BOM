@@ -28,7 +28,8 @@ class PartialComponentAllocator(BaseComponentAllocator):
         output_columns = {col: [] for col in [
             "SO_ID", "Plant", "Parent", "BOM_Level",
             "Item", "Order_Qty", "Stock_Before",
-            "Allocated_Qty", "Order_Remaining", "Remaining_Stock"
+            "Allocated_Qty", "Order_Remaining", "Remaining_Stock",
+            "Alloc_StockOnHand", "Alloc_StockInQC", "Alloc_StockInTransit"
         ]}
 
         def append_row(**kwargs):
@@ -93,26 +94,62 @@ class PartialComponentAllocator(BaseComponentAllocator):
 
                 self.logger.debug(f"BFS processing - Item: '{item}', Parent: '{parent}', Level: {level}, Order Qty: {order_qty}")
 
+                # if order_qty > 0:
+                #     if not self.stock_manager.has_stock(plant, so_id, item):
+                #         add_remark(
+                #             so_id,
+                #             f"No stock data for child component '{item}' at plant '{plant}'."
+                #         )
+                #         available = 0
+                #         self.logger.warning(f"No stock data for SO '{so_id}' | Item '{item}' at Plant '{plant}'")
+                #     else:
+                #         available = self.stock_manager.get_stock(plant, so_id, item)
+                #         self. logger.debug(f"Stock available for SO '{so_id}' | Item '{item}' at Plant '{plant}': {available}")
+                #     allocated = min(order_qty, available)
+                #     if self.config.get("round_allocation", False):
+                #         allocated = round(allocated, 2)
+                #     remaining = order_qty - allocated
+                #     stock_remaining = available - allocated
+                #     self.stock_manager.set_stock(plant, so_id, item, stock_remaining)
+                #     self.logger.info(f"Allocated {allocated} units for SO '{so_id}' | Item '{item}' | Remaining stock: {stock_remaining}")
+                # else:
+                #     available = allocated = remaining = stock_remaining = 0.0
+
                 if order_qty > 0:
-                    if not self.stock_manager.has_stock(plant, so_id, item):
+                    # --------------------------------------------
+                    # STRATEGY DECIDES QTY TO CONSUME
+                    # Partial component strategy = try full demand
+                    # --------------------------------------------
+                    qty_to_consume = order_qty
+
+                    allocation, unfulfilled = self.stock_manager.consume_with_priority(
+                        plant=plant,
+                        so_id=so_id,
+                        item=item,
+                        consume_qty=qty_to_consume
+                    )
+
+                    allocated = qty_to_consume - unfulfilled
+                    remaining = order_qty - allocated
+
+                    if allocated > 0:
+                        self.logger.info(
+                            "Allocated %s units for SO '%s' | Item '%s' | Remaining demand: %s",
+                            allocated, so_id, item, remaining
+                        )
+                    else:
                         add_remark(
                             so_id,
-                            f"No stock data for child component '{item}' at plant '{plant}'."
+                            f"No stock available for component '{item}' at plant '{plant}'."
                         )
-                        available = 0
-                        self.logger.warning(f"No stock data for SO '{so_id}' | Item '{item}' at Plant '{plant}'")
-                    else:
-                        available = self.stock_manager.get_stock(plant, so_id, item)
-                        self. logger.debug(f"Stock available for SO '{so_id}' | Item '{item}' at Plant '{plant}': {available}")
-                    allocated = min(order_qty, available)
-                    if self.config.get("round_allocation", False):
-                        allocated = round(allocated, 2)
-                    remaining = order_qty - allocated
-                    stock_remaining = available - allocated
-                    self.stock_manager.set_stock(plant, so_id, item, stock_remaining)
-                    self.logger.info(f"Allocated {allocated} units for SO '{so_id}' | Item '{item}' | Remaining stock: {stock_remaining}")
+                        self.logger.warning(
+                            "No allocation for SO '%s' | Item '%s'",
+                            so_id, item
+                        )
+
                 else:
-                    available = allocated = remaining = stock_remaining = 0.0
+                    allocation = {"stock_on_hand": 0, "stock_in_qc": 0, "stock_in_transit": 0}
+                    allocated = remaining = 0.0
 
                 # Capture output row
                 append_row(
@@ -122,10 +159,13 @@ class PartialComponentAllocator(BaseComponentAllocator):
                     BOM_Level=level,
                     Item=item,
                     Order_Qty=order_qty,
-                    Stock_Before=available,
+                    # Stock_Before=available,
                     Allocated_Qty=allocated,
+                    Alloc_StockOnHand=allocation.get("stock_on_hand", 0),
+                    Alloc_StockInQC=allocation.get("stock_in_qc", 0),
+                    Alloc_StockInTransit=allocation.get("stock_in_transit", 0),
                     Order_Remaining=remaining,
-                    Remaining_Stock=stock_remaining
+                    # Remaining_Stock=stock_remaining
                 )
 
                 # Always explode children
@@ -150,10 +190,13 @@ class PartialComponentAllocator(BaseComponentAllocator):
             "BOM_Level": pl.Series(output_columns["BOM_Level"], dtype=pl.Int64),
             "Item": pl.Series(output_columns["Item"], dtype=pl.Utf8),
             "Order_Qty": pl.Series(output_columns["Order_Qty"], dtype=pl.Float64),
-            "Stock_Before": pl.Series(output_columns["Stock_Before"], dtype=pl.Float64),
+            # "Stock_Before": pl.Series(output_columns["Stock_Before"], dtype=pl.Float64),
             "Allocated_Qty": pl.Series(output_columns["Allocated_Qty"], dtype=pl.Float64),
+            "Alloc_StockOnHand": pl.Series(output_columns["Alloc_StockOnHand"], dtype=pl.Float64),
+            "Alloc_StockInQC": pl.Series(output_columns["Alloc_StockInQC"], dtype=pl.Float64),
+            "Alloc_StockInTransit": pl.Series(output_columns["Alloc_StockInTransit"], dtype=pl.Float64),
             "Order_Remaining": pl.Series(output_columns["Order_Remaining"], dtype=pl.Float64),
-            "Remaining_Stock": pl.Series(output_columns["Remaining_Stock"], dtype=pl.Float64),
+            # "Remaining_Stock": pl.Series(output_columns["Remaining_Stock"], dtype=pl.Float64),
         })
 
         self.logger.info("Component allocation completed for all sales orders. Merging remarks into SO dataframe.")

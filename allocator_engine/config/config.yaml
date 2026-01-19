@@ -33,10 +33,12 @@ schemas:
     plant: Plant
   stock:
     order_id: order_ID
-    fg_id: parenT 
+    fg_id: parent
     item_id: Child
     plant: Plant
-    stock: Stock
+    stock_on_hand: Stock on Hand
+    stock_in_qc: Stock in QC
+    stock_in_transit: Stock in Transit
   bom:
     root_parent: Finished_Good
     parent: Parent

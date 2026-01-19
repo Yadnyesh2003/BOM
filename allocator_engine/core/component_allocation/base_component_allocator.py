@@ -36,7 +36,7 @@ class BaseComponentAllocator(ABC):
         return {
             "so": ["order_id", "fg_id", "plant", "order_qty"],
             "bom": ["root_parent", "parent", "child", "comp_qty", "plant"],
-            "stock": ["order_id", "item_id", "plant", "stock"]
+            "stock": ["order_id", "item_id", "plant", "stock_on_hand", "stock_in_qc", "stock_in_transit"]
         }
 
     @classmethod

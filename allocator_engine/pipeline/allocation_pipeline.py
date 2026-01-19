@@ -81,6 +81,28 @@ class AllocationPipeline:
             )    
         self.logger.info("All Input Files Read Successfully")    
         return data
+    
+
+    def _validate_stock_columns(self, stock_df):
+        STOCK_COLS = ["stock_on_hand", "stock_in_qc", "stock_in_transit"]
+        available_cols = [c for c in STOCK_COLS if c in stock_df.columns]
+        if not available_cols:
+            self.logger.error(
+                "Stock file does not contain any valid stock columns. "
+                "Expected at least one of %s",
+                STOCK_COLS
+            )
+            raise ValueError("No valid stock columns available for allocation")
+        missing = [c for c in STOCK_COLS if c not in stock_df.columns]
+        if missing:
+            self.logger.warning(
+                "Stock columns missing and will be ignored: %s", missing
+            )
+        self.logger.info(
+            "Stock columns detected for allocation (priority order preserved): %s",
+            available_cols
+        )
+        return available_cols
 
 
     # -------- internal pipeline steps --------
@@ -89,12 +111,22 @@ class AllocationPipeline:
         so_df = data["so_df"]
         stock_df = data["stock_df"]
 
+        # Validate stock columns
+        available_stock_cols = self._validate_stock_columns(stock_df)
+
         # Clean stock
         stock_df = stock_df.with_columns([
             pl.col("order_id").cast(pl.Utf8).str.strip_chars(),
             pl.col("item_id").cast(pl.Utf8).str.strip_chars(),
             pl.col("plant").cast(pl.Utf8).str.strip_chars(),
-            pl.col("stock").fill_null(0).cast(pl.Float64)
+            *[
+                pl.when(pl.col(c).is_null())
+                .then(0)
+                .otherwise(pl.col(c))
+                .cast(pl.Float64)
+                .alias(c)
+                for c in available_stock_cols
+            ]
         ])
         self.logger.info("Stock Data Cleaned")
 
@@ -103,7 +135,9 @@ class AllocationPipeline:
             stock_df
             .filter(pl.col("order_id").is_not_null() & (pl.col("order_id") != ""))
             .group_by(["order_id", "plant", "item_id"])
-            .agg(pl.sum("stock").alias("stock"))
+            .agg([
+                pl.sum(c).alias(c) for c in available_stock_cols
+            ])
         )
 
         # ITEM-level FG stock
@@ -111,7 +145,9 @@ class AllocationPipeline:
             stock_df
             .filter(pl.col("order_id").is_null() | (pl.col("order_id") == ""))
             .group_by(["plant", "item_id"])
-            .agg(pl.sum("stock").alias("stock"))
+            .agg([
+                pl.sum(c).alias(c) for c in available_stock_cols
+            ])
         )
         self.logger.info("Stock Aggregation Completed.")
         stock_manager = StockManager(self.logger)
@@ -147,6 +183,9 @@ class AllocationPipeline:
         so_df = data["so_df"]
         stock_df = data["stock_df"]
 
+        # Validate stock columns
+        available_stock_cols = self._validate_stock_columns(stock_df)
+
         # Clean data
         bom_df = bom_df.with_columns([
             pl.col("root_parent").cast(pl.Utf8).str.strip_chars(),
@@ -159,7 +198,14 @@ class AllocationPipeline:
             pl.col("order_id").cast(pl.Utf8).str.strip_chars(),
             pl.col("item_id").cast(pl.Utf8).str.strip_chars(),
             pl.col("plant").cast(pl.Utf8).str.strip_chars(),
-            pl.col("stock").fill_null(0).cast(pl.Float64)
+            *[
+                pl.when(pl.col(c).is_null())
+                .then(0)
+                .otherwise(pl.col(c))
+                .cast(pl.Float64)
+                .alias(c)
+                for c in available_stock_cols
+            ]
         ])
 
         self.logger.info("BOM & STOCK Data Cleaned.")
@@ -168,14 +214,18 @@ class AllocationPipeline:
         so_stock_df = (
             stock_df
             .filter(pl.col("order_id").is_not_null() & (pl.col("order_id") != ""))
-            .group_by(["order_id", "item_id", "plant"])
-            .agg(pl.sum("stock").alias("stock"))
+            .group_by(["order_id", "plant", "item_id"])
+            .agg([
+                pl.sum(c).alias(c) for c in available_stock_cols
+            ])
         )
         item_stock_df = (
             stock_df
             .filter(pl.col("order_id").is_null() | (pl.col("order_id") == ""))
-            .group_by(["item_id", "plant"])
-            .agg(pl.sum("stock").alias("stock"))
+            .group_by(["plant", "item_id"])
+            .agg([
+                pl.sum(c).alias(c) for c in available_stock_cols
+            ])
         )
 
         self.logger.info("Stock Aggregation Completed.")
